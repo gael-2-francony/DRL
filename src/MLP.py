@@ -1,16 +1,17 @@
 import numpy as np
+from RL import preprocessing
 
 def softmax_ind(X, ind):
     return np.exp(X[ind]) / np.sum(np.exp(X), axis=-1)
 
 def softmax(X):
-    return np.array([softmax_ind(x, i) for i,x in enumerate(X)])
+    return np.array([softmax_ind(X, i) for i,_ in enumerate(X)])
 
 def deriv_softmax_ind(X, ind):
     return np.exp(X[ind]) * np.sum(np.exp([x for i,x in enumerate(X) if i!=ind] ), axis=-1) / np.square(np.sum(np.exp(X), axis=-1))
 
 def deriv_softmax(X):
-    return np.array([deriv_softmax_ind(x, i) for i,x in enumerate(X)])
+    return np.array([deriv_softmax_ind(X, i) for i,_ in enumerate(X)])
 
 def sigmoid(X):
     return 1 / (1 + np.exp(-X))
@@ -27,7 +28,7 @@ class MLP():
     to the direction the player should move in.
     """
     def __init__(self, input_shape, hidden_shape, output_shape=9, learning_rate=0.0001):
-        self.Wh = np.random.uniform(low=-0.05, high=0.05, size=(input_shape, hidden_shape))
+        self.Wh = np.random.uniform(low=-0.05, high=0.05, size=(np.prod(input_shape), hidden_shape))
         self.Bh = np.zeros(hidden_shape)
         self.Wo = np.random.uniform(low=-0.05, high=0.05, size=(hidden_shape, output_shape))
         self.Bo = np.zeros(output_shape)
@@ -35,7 +36,7 @@ class MLP():
         return
 
     def forward(self, X):
-        _,_,probas = forward_keep_activations(X)
+        _,_,probas = self.forward_keep_activations(X)
         return probas
 
 
@@ -62,4 +63,5 @@ class MLP():
 
     def predict(self, X): #TODO
         # Use final weights and biases to compute prediction for given input
+        X = preprocessing(X)
         return np.argmax(self.forward(X))

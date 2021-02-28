@@ -1,5 +1,6 @@
 import pygame
 import random
+import numpy as np
 
 from pygame.locals import K_ESCAPE, KEYDOWN, QUIT
 from scene import ClassicScene
@@ -42,7 +43,11 @@ class Engine():
 
                 self.scene.update_event(event)
 
-            self.running = self.scene.update()
+            frame = self.screen.get_buffer()
+            frame_buffer = np.fromstring(frame.raw, dtype='b').reshape(self.SCREEN_HEIGHT, self.SCREEN_WIDTH, 4)
+
+            self.running = self.scene.update(frame_buffer[:,:,0])
+            del frame
 
             # Fill the screen with black
             self.screen.fill((0, 0, 0))

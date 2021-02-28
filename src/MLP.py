@@ -19,7 +19,7 @@ def deriv_sigmoid(X):
     return sigmoid(X) * (1 - sigmoid(X))
 
 class MLP():
-    def __init__(self, input_shape, nb_neurons, learning_rate):
+    def __init__(self, input_shape, nb_neurons, learning_rate=0.0001):
         self.Wh = np.random.uniform(low=-0.05, high=0.05, size=(input_shape, nb_neurons))
         self.Bh = np.zeros(nb_neurons)
         self.Wo = np.random.uniform(low=-0.05, high=0.05, size=(nb_neurons, 8))

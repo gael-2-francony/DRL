@@ -26,11 +26,11 @@ class MLP():
     Should be fed with a frame from the game and outputs a number between 0 and 7 corresponding
     to the direction the player should move in.
     """
-    def __init__(self, input_shape, nb_neurons, learning_rate=0.0001):
-        self.Wh = np.random.uniform(low=-0.05, high=0.05, size=(input_shape, nb_neurons))
-        self.Bh = np.zeros(nb_neurons)
-        self.Wo = np.random.uniform(low=-0.05, high=0.05, size=(nb_neurons, 8))
-        self.Bo = np.zeros(8)
+    def __init__(self, input_shape, hidden_shape, output_shape=9, learning_rate=0.0001):
+        self.Wh = np.random.uniform(low=-0.05, high=0.05, size=(input_shape, hidden_shape))
+        self.Bh = np.zeros(hidden_shape)
+        self.Wo = np.random.uniform(low=-0.05, high=0.05, size=(hidden_shape, output_shape))
+        self.Bo = np.zeros(output_shape)
         self.learning_rate = learning_rate
         return
 
@@ -40,9 +40,9 @@ class MLP():
 
 
     def forward_keep_activations(self, X):
-        zh = np.inner(X, self.Wh) + self.Bh
+        zh = np.dot(X, self.Wh) + self.Bh
         activation_h = sigmoid(zh)
-        zo = np.inner(zh, self.Wo) + self.Bo
+        zo = np.dot(zh, self.Wo) + self.Bo
         activation_o = sigmoid(zo)
         probas = softmax(activation_o)
         return activation_h, activation_o, probas

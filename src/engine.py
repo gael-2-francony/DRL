@@ -4,13 +4,13 @@ import numpy as np
 
 from pygame.locals import K_ESCAPE, KEYDOWN, QUIT
 from scene import ClassicScene
-SCREEN_WIDTH_g = 800
-SCREEN_HEIGHT_g = 600
+from config import SCREEN_HEIGHT_g, SCREEN_WIDTH_g
+
 class Engine():
     def __init__(self, use_AIPlayer=True):
         # Define constants for the screen width and height
-        self.SCREEN_WIDTH = SCREEN_WIDTH_g
-        self.SCREEN_HEIGHT = SCREEN_HEIGHT_g
+        self.screen_width = SCREEN_WIDTH_g
+        self.screen_height = SCREEN_HEIGHT_g
 
         # Initialize pygame
         pygame.init()
@@ -76,7 +76,7 @@ class TrainingEngine(Engine):
     def __init__(self, file_name=None):
         super(TrainingEngine, self).__init__(True)
         self.out_file_name = file_name
-        self.fps = 360
+        self.fps = 120
     
     def update(self):
         if not self.scene.update(self.compute_decision_frame()[:,:,0]):

@@ -3,7 +3,7 @@ import pygame
 from player import *
 from enemy import Enemy
 from RL import RL_Agent
-from engine import SCREEN_HEIGHT_g, SCREEN_WIDTH_g
+from config import SCREEN_HEIGHT_g, SCREEN_WIDTH_g
 
 class ClassicScene():
     def __init__(self, screen_width, screen_height, use_AIPlayer=False):

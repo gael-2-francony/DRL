@@ -1,5 +1,11 @@
 import numpy as np
-from RL import preprocessing, one_hot
+
+def preprocessing(X):
+    X = X.flatten()
+    return X
+
+def one_hot(move):
+    return np.eye(move.shape[0])[np.argmax(move)]
 
 def softmax_ind(X, ind):
     return np.exp(X[ind]) / np.sum(np.exp(X), axis=-1)
@@ -41,7 +47,7 @@ class MLP():
         return
 
     def forward(self, X):
-        _,_,y_pred = self.forward_keep_activations(X)
+        _,y_pred = self.forward_keep_activations(X)
         return y_pred
 
 
@@ -83,5 +89,4 @@ class MLP():
 
     def predict(self, X): #TODO
         # Use final weights and biases to compute prediction for given input
-        X = preprocessing(X)
         return np.argmax(self.forward(X))

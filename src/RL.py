@@ -1,5 +1,5 @@
-from MLP import MLP
-from engine import SCREEN_HEIGHT_g, SCREEN_WIDTH_g
+from MLP import MLP, one_hot, preprocessing
+from config import SCREEN_HEIGHT_g, SCREEN_WIDTH_g
 import numpy as np
 
 def preprocessing(X):

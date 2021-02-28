@@ -1,1 +1,7 @@
 .history
+*.pyc
+*.xml
+*.iml
+*.swp
+*-checkpoint*
+*src/__pycache__/*

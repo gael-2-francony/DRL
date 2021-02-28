@@ -2,11 +2,11 @@ import pygame
 
 from player import *
 from enemy import Enemy
-from MLP import MLP
+from RL import RL_Agent
 from engine import SCREEN_HEIGHT_g, SCREEN_WIDTH_g
 
 class ClassicScene():
-    def __init__(self, screen_width, screen_height):
+    def __init__(self, screen_width, screen_height, use_AIPlayer=False):
         self.SCREEN_WIDTH = screen_width
         self.SCREEN_HEIGHT = screen_height
 
@@ -14,14 +14,25 @@ class ClassicScene():
         self.ADDENEMY = pygame.USEREVENT + 1
         pygame.time.set_timer(self.ADDENEMY, 250)
 
-        self.agent = MLP((SCREEN_WIDTH_g, SCREEN_HEIGHT_g), 16)
+        self.agent = None
+        if (use_AIPlayer):
+            self.agent = RL_Agent()
         self.player = Player(self.agent)
-
-        self.enemies = pygame.sprite.Group()
-        self.enemy_speed = (5, 20)
 
         self.all_sprites = pygame.sprite.Group()
         self.all_sprites.add(self.player)
+
+        self.enemy_speed = (5, 20)
+        self.enemies = pygame.sprite.Group()
+
+    def reset(self):
+        self.player = Player(self.agent)
+
+        self.all_sprites = pygame.sprite.Group()
+        self.all_sprites.add(self.player)
+
+        self.enemies = pygame.sprite.Group()
+
     
     def update_event(self, event):
         # Add a new enemy?
@@ -31,23 +42,19 @@ class ClassicScene():
             self.enemies.add(new_enemy)
             self.all_sprites.add(new_enemy)
 
-    def update(self, frame_buffer):
-        # Get the set of keys pressed and check for user input
-        #pressed_keys = pygame.key.get_pressed()
-        self.player.update_agent(frame_buffer, self.SCREEN_WIDTH, self.SCREEN_HEIGHT)
+    def update(self, frame):
+        self.player.update(self.SCREEN_WIDTH, self.SCREEN_HEIGHT, frame)
 
-        # Update enemy position
         self.enemies.update()
 
-        # Check if any enemies have collided with the player
+        # Check collisions
         if pygame.sprite.spritecollideany(self.player, self.enemies):
-            # If so, then remove the player and stop the loop
-            self.player.kill()
+            self.player.has_died(frame)
             return False
         return True
 
 class FastScene(ClassicScene):
-    def __init__(self, screen_width, screen_height):
-        super(FastScene, self).__init__(screen_width, screen_height)
+    def __init__(self, screen_width, screen_height, use_AIPlayer=False):
+        super(FastScene, self).__init__(screen_width, screen_height, use_AIPlayer)
         pygame.time.set_timer(self.ADDENEMY, 100)
         self.enemy_speed = (20, 30)

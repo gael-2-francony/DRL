@@ -7,56 +7,81 @@ from scene import ClassicScene
 SCREEN_WIDTH_g = 800
 SCREEN_HEIGHT_g = 600
 class Engine():
-    def __init__(self):
+    def __init__(self, use_AIPlayer=True):
         # Define constants for the screen width and height
         self.SCREEN_WIDTH = SCREEN_WIDTH_g
         self.SCREEN_HEIGHT = SCREEN_HEIGHT_g
 
         # Initialize pygame
         pygame.init()
-
         self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
 
-        self.scene = ClassicScene(self.screen_width, self.screen_height)
+        self.scene = ClassicScene(self.screen_width, self.screen_height, use_AIPlayer)
 
         self.running = True
         self.clock = pygame.time.Clock()
+        self.fps = 30
 
         self.prev_frame = None 
-
     
+    def reset(self):
+        self.prev_frame = None
+        self.scene.reset()
+        pass
+    
+    def draw(self):
+        # Draw all sprites
+        self.screen.fill((0, 0, 0))
+        for entity in self.scene.all_sprites:
+            self.screen.blit(entity.surf, entity.rect)
+        pygame.display.flip()
+
+    def compute_decision_frame(self):
+        frame = self.screen.get_buffer()
+        frame_buffer = np.fromstring(frame.raw, dtype='b').reshape(self.screen_height, self.screen_width, 4)
+        if self.prev_frame is not None:
+            diff = frame_buffer - self.prev_frame
+        else:
+            diff = frame_buffer
+        self.prev_frame = frame_buffer
+        del frame
+        return diff
+
+    def update(self):
+        self.running = self.scene.update(self.compute_decision_frame()[:,:,0])
+    
+    def end(self):
+        pass
+
     def run_loop(self):
-        # Main loop
         while self.running:
-            # Look at every event in the queue
             for event in pygame.event.get():
-                # Did the user hit a key?
                 if event.type == KEYDOWN:
-                    # Was it the Escape key? If so, stop the loop.
                     if event.key == K_ESCAPE:
                         running = False
-
-                # Did the user click the window close button? If so, stop the loop.
                 elif event.type == QUIT:
                     running = False
 
                 self.scene.update_event(event)
 
-            frame = self.screen.get_buffer()
-            frame_buffer = np.fromstring(frame.raw, dtype='b').reshape(self.screen_height, self.screen_width, 4)
-            if self.prev_frame is not None:
-                diff = frame_buffer - self.prev_frame
-            else:
-                diff = frame_buffer
-            self.prev_frame = frame_buffer
+            self.update()
 
-            self.running = self.scene.update(diff[:,:,0])
-            del frame
+            self.draw()
 
-            # Draw all sprites
-            self.screen.fill((0, 0, 0))
-            for entity in self.scene.all_sprites:
-                self.screen.blit(entity.surf, entity.rect)
-            pygame.display.flip()
+            self.clock.tick(self.fps)
 
-            self.clock.tick(30)
+        self.end()
+
+class TrainingEngine(Engine):
+    def __init__(self, file_name=None):
+        super(TrainingEngine, self).__init__(True)
+        self.out_file_name = file_name
+        self.fps = 360
+    
+    def update(self):
+        if not self.scene.update(self.compute_decision_frame()[:,:,0]):
+            self.reset()
+    
+    def end(self):
+        # Save weights here
+        pass

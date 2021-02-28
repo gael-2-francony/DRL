@@ -7,9 +7,7 @@ from pygame.locals import (
     K_DOWN,
     K_LEFT,
     K_RIGHT,
-    K_ESCAPE,
     KEYDOWN,
-    QUIT,
 )
 
 # Define a Player object by extending pygame.sprite.Sprite
@@ -21,9 +19,17 @@ class Player(pygame.sprite.Sprite):
         self.surf = pygame.Surface((75, 25))
         self.surf.fill((255, 255, 255))
         self.rect = self.surf.get_rect()
+        print("Starting :", self.rect)
+
+    def update(self, screen_width, screen_height, frame=None):
+        if self.agent is not None:
+            self.update_agent(frame, screen_width, screen_height)
+        else:
+            self.update_player(screen_width, screen_height)
     
     # Move the sprite based on user keypresses
-    def update_player(self, pressed_keys, screen_width, screen_height):
+    def update_player(self, screen_width, screen_height):
+        pressed_keys = pygame.key.get_pressed()
         if pressed_keys[K_UP]:
             self.rect.move_ip(0, -5)
         if pressed_keys[K_DOWN]:
@@ -43,9 +49,13 @@ class Player(pygame.sprite.Sprite):
         if self.rect.bottom >= screen_height:
             self.rect.bottom = screen_height
     
+    def has_died(self, frame):
+        self.kill()
+        if self.agent:
+            self.agent.update(frame, True)
+    
     def update_agent(self, frame, screen_width, screen_height):
-        move = self.agent.predict(frame)
-        print(f"Move : {move}")
+        move = self.agent.update(frame, False)
         if move == 1: #UP
             self.rect.move_ip( 0, -5)
         if move == 2: # DOWN

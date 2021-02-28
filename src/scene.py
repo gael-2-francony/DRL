@@ -3,6 +3,7 @@ import pygame
 from player import *
 from enemy import Enemy
 from MLP import MLP
+from engine import SCREEN_HEIGHT_g, SCREEN_WIDTH_g
 
 class ClassicScene():
     def __init__(self, screen_width, screen_height):
@@ -13,7 +14,7 @@ class ClassicScene():
         self.ADDENEMY = pygame.USEREVENT + 1
         pygame.time.set_timer(self.ADDENEMY, 250)
 
-        self.agent = MLP((800, 600), 16)
+        self.agent = MLP((SCREEN_WIDTH_g, SCREEN_HEIGHT_g), 16)
         self.player = Player(self.agent)
 
         self.enemies = pygame.sprite.Group()

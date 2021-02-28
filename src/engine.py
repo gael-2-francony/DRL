@@ -4,12 +4,13 @@ import numpy as np
 
 from pygame.locals import K_ESCAPE, KEYDOWN, QUIT
 from scene import ClassicScene
-
+SCREEN_WIDTH_g = 800
+SCREEN_HEIGHT_g = 600
 class Engine():
     def __init__(self):
         # Define constants for the screen width and height
-        self.screen_width = 800
-        self.screen_height = 600
+        self.SCREEN_WIDTH = SCREEN_WIDTH_g
+        self.SCREEN_HEIGHT = SCREEN_HEIGHT_g
 
         # Initialize pygame
         pygame.init()

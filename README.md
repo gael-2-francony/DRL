@@ -5,6 +5,11 @@ This is a project made for fun to better understand how Reinforcement Learning w
 
 Made by Thibaut Benefice, Gael De Francony and Celian Gossec
 
+## Requirements
+```
+pip install pygame
+```
+
 ## Usage
 ```
 python src/space_asteroids.py

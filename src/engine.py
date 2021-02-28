@@ -1,8 +1,8 @@
 import pygame
 import random
 
-from player import *
-from enemy import Enemy
+from pygame.locals import K_ESCAPE, KEYDOWN, QUIT
+from scene import ClassicScene
 
 class Engine():
     def __init__(self):
@@ -17,19 +17,7 @@ class Engine():
         # The size is determined by the constant SCREEN_WIDTH and SCREEN_HEIGHT
         self.screen = pygame.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
 
-        # Create a custom event for adding a new enemy
-        self.ADDENEMY = pygame.USEREVENT + 1
-        pygame.time.set_timer(self.ADDENEMY, 250)
-
-        # Instantiate player. Right now, this is just a rectangle.
-        self.player = Player()
-
-        # Create groups to hold enemy sprites and all sprites
-        # - enemies is used for collision detection and position updates
-        # - all_sprites is used for rendering
-        self.enemies = pygame.sprite.Group()
-        self.all_sprites = pygame.sprite.Group()
-        self.all_sprites.add(self.player)
+        self.scene = ClassicScene(self.SCREEN_WIDTH, self.SCREEN_HEIGHT)
 
         # Variable to keep the main loop running
         self.running = True
@@ -52,32 +40,16 @@ class Engine():
                 elif event.type == QUIT:
                     running = False
 
-                # Add a new enemy?
-                elif event.type == self.ADDENEMY:
-                    # Create the new enemy and add it to sprite groups
-                    new_enemy = Enemy(self.SCREEN_WIDTH, self.SCREEN_HEIGHT)
-                    self.enemies.add(new_enemy)
-                    self.all_sprites.add(new_enemy)
+                self.scene.update_event(event)
 
-            # Get the set of keys pressed and check for user input
-            pressed_keys = pygame.key.get_pressed()
-            self.player.update(pressed_keys, self.SCREEN_WIDTH, self.SCREEN_HEIGHT)
-
-            # Update enemy position
-            self.enemies.update()
+            self.running = self.scene.update()
 
             # Fill the screen with black
             self.screen.fill((0, 0, 0))
 
             # Draw all sprites
-            for entity in self.all_sprites:
+            for entity in self.scene.all_sprites:
                 self.screen.blit(entity.surf, entity.rect)
-
-            # Check if any enemies have collided with the player
-            if pygame.sprite.spritecollideany(self.player, self.enemies):
-                # If so, then remove the player and stop the loop
-                self.player.kill()
-                self.running = False
 
             # Update the display
             pygame.display.flip()

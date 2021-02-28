@@ -1,5 +1,5 @@
 import numpy as np
-from RL import preprocessing
+from RL import preprocessing, one_hot
 
 def softmax_ind(X, ind):
     return np.exp(X[ind]) / np.sum(np.exp(X), axis=-1)
@@ -19,6 +19,11 @@ def sigmoid(X):
 def deriv_sigmoid(X):
     return sigmoid(X) * (1 - sigmoid(X))
 
+def deriv_cross_entropy(y_pred, y_true):
+    ind = np.argmax(y_true)
+    y = one_hot(y_true)
+    return  -y / y_pred[ind]
+
 class MLP():
     """
     A Multi-Layer Perceptron, also called Fully Connected Neural Network to decide the policy
@@ -36,29 +41,44 @@ class MLP():
         return
 
     def forward(self, X):
-        _,_,probas = self.forward_keep_activations(X)
-        return probas
+        _,_,y_pred = self.forward_keep_activations(X)
+        return y_pred
 
 
     def forward_keep_activations(self, X):
         zh = np.dot(X, self.Wh) + self.Bh
         activation_h = sigmoid(zh)
-        zo = np.dot(zh, self.Wo) + self.Bo
-        activation_o = sigmoid(zo)
-        probas = softmax(activation_o)
-        return activation_h, activation_o, probas
+        zo = np.dot(activation_h, self.Wo) + self.Bo
+        y_pred = softmax(zo)
+        return activation_h, y_pred
 
     #Implement Negative Log Likehood (also called cross-entropy)
-    def loss(self, y_pred, y_true):
+    def cross_entropy(self, y_pred, y_true):
         return -np.mean(np.sum(y_true * np.log(y_pred), axis=-1))
 
-    def gradients(self, FIXME): #TODO
-        pass #Compute gradients for weights and biases using Chain rule
+    def gradients(self, X, act_h, y_pred, y_true): #Compute gradients for weights and biases using Chain rule
+        deriv_loss = deriv_cross_entropy(y_pred, y_true)
+        zo = np.dot(act_h, self.Wo) + self.Bo 
+        deriv_y_pred = deriv_softmax(zo) * deriv_loss
+        grad_wo = np.outer(act_h , deriv_y_pred)
+        grad_bo = deriv_y_pred
+        deriv_zo = np.dot(self.Wo, deriv_y_pred)
+        zh = np.dot(X, self.Wh) + self.Bh 
+        deriv_act_h = deriv_sigmoid(zh) * deriv_zo
+        grad_wh = np.outer(X , deriv_act_h)
+        grad_bh = deriv_act_h
+        return {"grad_wo" : grad_wo, "grad_bo" : grad_bo, "grad_wh" : grad_wh, "grad_bh" : grad_bh}
 
-    def backward(self, y_pred): #TODO
-        pass #Update weights and biases using gradients
+    def backward(self, grad): #TODO
+        self.Wo -= (self.learning_rate * grad["grad_wo"])
+        self.Bo -= (self.learning_rate * grad["grad_bo"])
+        self.Wh -= (self.learning_rate * grad["grad_wh"])
+        self.Bh -= (self.learning_rate * grad["grad_bh"])
 
-    def train(self, X): #TODO
+    def train(self, X, y_true): #TODO
+        act_h, y_pred = self.forward_keep_activations(X)
+        grads = self.gradients(X, act_h, y_pred, y_true)
+        self.backward(grads)
         pass #Iterate cross-entropy over batch of data and backpropagate accordingly
 
     def predict(self, X): #TODO

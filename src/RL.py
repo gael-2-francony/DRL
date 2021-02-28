@@ -2,42 +2,41 @@ from MLP import MLP, one_hot, preprocessing
 from config import SCREEN_HEIGHT_g, SCREEN_WIDTH_g
 import numpy as np
 
-def preprocessing(X):
-    X = X.flatten()
-    return X
-
-def one_hot(move):
-    return np.eye(move.shape[0])[np.argmax(move)]
-
 def wrong_move(y_true):
     y_true[y_true == 0] = 1 / (y_true.shape[0] - 1)
     y_true[y_true == 1] = 0
     return y_true
+
 class RL_Agent():
-    def __init__(self, episode_size=50):
+    def __init__(self, episode_size=150):
         self.model = MLP((SCREEN_HEIGHT_g, SCREEN_WIDTH_g), 16)
-        self.moves = []
+        self.activations = []
         self.episode_size = episode_size
         self.iter = 0
 
     def update(self, frame, is_dead):
-        y_pred = self.model.forward(frame)
-        self.moves.append(y_pred)
+        frame = preprocessing(frame)
+        act_h, y_pred = self.model.forward_keep_activations(frame)
+        self.activations.append((act_h, y_pred))
+        return np.argmax(y_pred)
 
         y_true_cur = one_hot(y_pred)
-        self.model.backward(y_pred, y_true_cur)
+        grads = self.model.gradients(frame, act_h, y_pred, y_true_cur)
+        self.model.backward(grads)
 
         self.iter += 1
         if is_dead or self.iter == self.episode_size:
-            for move in self.moves:
+            for activation in self.activations:
                 if is_dead: # Agent is dead
-                    y_true = wrong_move(one_hot(move))
-                    self.model.backward(move, y_true)
+                    y_true = wrong_move(one_hot(activation[1]))
+                    grads = self.model.gradients(frame, activation[0], activation[1], y_true)
+                    self.model.backward(grads)
             self.reset()
-        return move
+            print("Episode done.")
+        return np.argmax(y_pred)
 
     def reset(self):
-        self.moves = []
+        self.activations = []
         self.iter = 0
 
 

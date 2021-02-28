@@ -19,6 +19,13 @@ def deriv_sigmoid(X):
     return sigmoid(X) * (1 - sigmoid(X))
 
 class MLP():
+    """
+    A Multi-Layer Perceptron, also called Fully Connected Neural Network to decide the policy
+    for the RL framework.
+
+    Should be fed with a frame from the game and outputs a number between 0 and 7 corresponding
+    to the direction the player should move in.
+    """
     def __init__(self, input_shape, nb_neurons, learning_rate=0.0001):
         self.Wh = np.random.uniform(low=-0.05, high=0.05, size=(input_shape, nb_neurons))
         self.Bh = np.zeros(nb_neurons)
@@ -54,4 +61,5 @@ class MLP():
         pass #Iterate cross-entropy over batch of data and backpropagate accordingly
 
     def predict(self, X): #TODO
-        pass #Use final weights and biases to compute prediction for given input
+        # Use final weights and biases to compute prediction for given input
+        return np.argmax(self.forward(X))

@@ -4,7 +4,7 @@ import random
 from config import SCREEN_HEIGHT_g, SCREEN_WIDTH_g
 
 class Enemy(pygame.sprite.Sprite):
-    def __init__(self, speed_range=(5, 20)):
+    def __init__(self, speed_range):
         super(Enemy, self).__init__()
         self.surf = pygame.Surface((5, 2))
         self.surf.fill((255, 255, 255))

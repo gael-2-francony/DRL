@@ -7,8 +7,8 @@ from RL import RL_Agent
 class ClassicScene():
     def __init__(self, use_AIPlayer=False):
 
-        self.ADDENEMY = pygame.USEREVENT + 1
-        pygame.time.set_timer(self.ADDENEMY, 250)
+        self.add_enemy_time = 5
+        self.add_enemy_tick = 0
 
         self.agent = None
         if (use_AIPlayer):
@@ -18,7 +18,7 @@ class ClassicScene():
         self.all_sprites = pygame.sprite.Group()
         self.all_sprites.add(self.player)
 
-        self.enemy_speed = (5, 20)
+        self.enemy_speed = (1, 3)
         self.enemies = pygame.sprite.Group()
 
     def reset(self):
@@ -29,15 +29,17 @@ class ClassicScene():
 
         self.enemies = pygame.sprite.Group()
 
-    
-    def update_event(self, event):
-        if event.type == self.ADDENEMY:
+    def update(self, frame):
+        if not self.player.update(frame):
+            self.player.has_died(frame)
+            return False
+
+        self.add_enemy_tick += 1
+        if self.add_enemy_tick >= self.add_enemy_time:
+            self.add_enemy_tick = 0
             new_enemy = Enemy(self.enemy_speed)
             self.enemies.add(new_enemy)
             self.all_sprites.add(new_enemy)
-
-    def update(self, frame):
-        self.player.update(frame)
 
         self.enemies.update()
 

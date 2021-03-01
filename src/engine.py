@@ -7,8 +7,9 @@ from scene import ClassicScene
 from config import SCREEN_HEIGHT_g, SCREEN_WIDTH_g
 
 class Engine():
-    def __init__(self, use_AIPlayer=True):
+    def __init__(self, use_AIPlayer=True, render=False):
         # Initialize pygame
+        self.render = render
         pygame.init()
         self.screen = pygame.display.set_mode((SCREEN_WIDTH_g, SCREEN_HEIGHT_g))
 
@@ -23,14 +24,15 @@ class Engine():
     def reset(self):
         self.prev_frame = None
         self.scene.reset()
-        pass
     
     def draw(self):
         # Draw all sprites
         self.screen.fill((0, 0, 0))
         for entity in self.scene.all_sprites:
             self.screen.blit(entity.surf, entity.rect)
-        pygame.display.flip()
+
+        if self.render:
+            pygame.display.flip()
 
     def compute_decision_frame(self):
         frame = self.screen.get_buffer()
@@ -58,8 +60,6 @@ class Engine():
                 elif event.type == QUIT:
                     self.running = False
 
-                self.scene.update_event(event)
-
             self.update()
 
             self.draw()
@@ -69,8 +69,8 @@ class Engine():
         self.end()
 
 class TrainingEngine(Engine):
-    def __init__(self, file_name=None):
-        super(TrainingEngine, self).__init__(True)
+    def __init__(self, file_name=None, render=True):
+        super(TrainingEngine, self).__init__(True, render)
         self.out_file_name = file_name
         self.fps = 360
     

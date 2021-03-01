@@ -5,6 +5,8 @@ def preprocessing(X):
     return X
 
 def one_hot(move):
+    if type(move) is type(2):
+        return np.eye(8)[move] #TODO should be MLP.input_shape but hardcoding until better solution
     return np.eye(move.shape[0])[np.argmax(move)]
 
 def softmax_ind(X, ind):
@@ -38,10 +40,10 @@ class MLP():
     Should be fed with a frame from the game and outputs a number between 0 and 7 corresponding
     to the direction the player should move in.
     """
-    def __init__(self, input_shape, hidden_shape, output_shape=9, learning_rate=0.0001):
-        self.Wh = np.random.uniform(low=-0.05, high=0.05, size=(np.prod(input_shape), hidden_shape))
+    def __init__(self, input_shape, hidden_shape, output_shape=8, learning_rate=0.0001):
+        self.Wh = np.random.uniform(low=-0.01, high=0.01, size=(np.prod(input_shape), hidden_shape))
         self.Bh = np.zeros(hidden_shape)
-        self.Wo = np.random.uniform(low=-0.05, high=0.05, size=(hidden_shape, output_shape))
+        self.Wo = np.random.uniform(low=-0.01, high=0.01, size=(hidden_shape, output_shape))
         self.Bo = np.zeros(output_shape)
         self.learning_rate = learning_rate
         return
@@ -63,9 +65,7 @@ class MLP():
         return -np.mean(np.sum(y_true * np.log(y_pred), axis=-1))
 
     def gradients(self, X, act_h, y_pred, y_true): #Compute gradients for weights and biases using Chain rule
-        deriv_loss = deriv_cross_entropy(y_pred, y_true)
-        zo = np.dot(act_h, self.Wo) + self.Bo 
-        deriv_y_pred = deriv_softmax(zo) * deriv_loss
+        deriv_y_pred = y_pred - y_true
         grad_wo = np.outer(act_h , deriv_y_pred)
         grad_bo = deriv_y_pred
         deriv_zo = np.dot(self.Wo, deriv_y_pred)

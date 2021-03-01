@@ -42,15 +42,19 @@ class RL_Agent():
         self.activations = []
         self.iter = 0
     
-    def load(self):
-        pass
+    def load(self, path):
+        loaded = np.load(path)
+        self.model.Wh = loaded['Wh']
+        self.model.Bh = loaded['Bh']
+        self.model.Wo = loaded['Wo']
+        self.model.Bo = loaded['Bo']
     
     def save(self):
         np.savez_compressed("models/model_" + str(self.nb_episodes),
-            Wh=self.model.Wh,
-            Bh=self.model.Bh,
-            Wo=self.model.Wo,
-            Bo=self.model.Bo)
+            'Wh'=self.model.Wh,
+            'Bh'=self.model.Bh,
+            'Wo'=self.model.Wo,
+            'Bo'=self.model.Bo)
 
 
 

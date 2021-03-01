@@ -41,7 +41,7 @@ class RL_Agent():
     def reset(self):
         self.activations = []
         self.iter = 0
-
+    
     def load(self):
         pass
     

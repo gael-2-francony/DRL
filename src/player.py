@@ -19,7 +19,6 @@ class Player(pygame.sprite.Sprite):
         self.surf = pygame.Surface((75, 25))
         self.surf.fill((255, 255, 255))
         self.rect = self.surf.get_rect()
-        print("Starting :", self.rect)
 
     def update(self, screen_width, screen_height, frame=None):
         if self.agent is not None:

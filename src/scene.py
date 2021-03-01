@@ -52,6 +52,10 @@ class ClassicScene():
             self.player.has_died(frame)
             return False
         return True
+    
+    def end(self):
+        if self.agent:
+            self.agent.save()
 
 class FastScene(ClassicScene):
     def __init__(self, screen_width, screen_height, use_AIPlayer=False):

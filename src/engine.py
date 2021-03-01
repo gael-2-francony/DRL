@@ -58,9 +58,9 @@ class Engine():
             for event in pygame.event.get():
                 if event.type == KEYDOWN:
                     if event.key == K_ESCAPE:
-                        running = False
+                        self.running = False
                 elif event.type == QUIT:
-                    running = False
+                    self.running = False
 
                 self.scene.update_event(event)
 
@@ -76,12 +76,11 @@ class TrainingEngine(Engine):
     def __init__(self, file_name=None):
         super(TrainingEngine, self).__init__(True)
         self.out_file_name = file_name
-        self.fps = 120
+        self.fps = 360
     
     def update(self):
         if not self.scene.update(self.compute_decision_frame()[:,:,0]):
             self.reset()
     
     def end(self):
-        # Save weights here
-        pass
+        self.scene.end()

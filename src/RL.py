@@ -13,16 +13,13 @@ class RL_Agent():
         self.activations = []
         self.episode_size = episode_size
         self.iter = 0
+        self.nb_episodes = 0
 
     def update(self, frame, is_dead):
         frame = preprocessing(frame)
         act_h, y_pred = self.model.forward_keep_activations(frame)
         self.activations.append((act_h, y_pred))
         return np.argmax(y_pred)
-
-        y_true_cur = one_hot(y_pred)
-        grads = self.model.gradients(frame, act_h, y_pred, y_true_cur)
-        self.model.backward(grads)
 
         self.iter += 1
         if is_dead or self.iter == self.episode_size:
@@ -31,8 +28,14 @@ class RL_Agent():
                     y_true = wrong_move(one_hot(activation[1]))
                     grads = self.model.gradients(frame, activation[0], activation[1], y_true)
                     self.model.backward(grads)
+                else:
+                    y_true = one_hot(activation[1])
+                    grads = self.model.gradients(frame, activation[0], activation[1], y_true)
+                    self.model.backward(grads)
+
             self.reset()
-            print("Episode done.")
+            self.nb_episodes += 1
+            print(f"Episode #{self.nb_episodes} : {'LOSE' if is_dead else 'WIN'}")
         return np.argmax(y_pred)
 
     def reset(self):

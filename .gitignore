@@ -5,3 +5,4 @@
 *.swp
 *-checkpoint*
 *src/__pycache__/*
+*models/*

@@ -19,7 +19,6 @@ class RL_Agent():
         frame = preprocessing(frame)
         act_h, y_pred = self.model.forward_keep_activations(frame)
         self.activations.append((act_h, y_pred))
-        return np.argmax(y_pred)
 
         self.iter += 1
         if is_dead or self.iter == self.episode_size:

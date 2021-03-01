@@ -1,15 +1,17 @@
 import pygame
 import random
 
+from config import SCREEN_HEIGHT_g, SCREEN_WIDTH_g
+
 class Enemy(pygame.sprite.Sprite):
-    def __init__(self, screen_width, screen_height, speed_range=(5, 20)):
+    def __init__(self, speed_range=(5, 20)):
         super(Enemy, self).__init__()
-        self.surf = pygame.Surface((20, 10))
+        self.surf = pygame.Surface((5, 2))
         self.surf.fill((255, 255, 255))
         self.rect = self.surf.get_rect(
             center=(
-                random.randint(screen_width + 20, screen_width + 100),
-                random.randint(0, screen_height),
+                random.randint(SCREEN_WIDTH_g + 20, SCREEN_WIDTH_g + 100),
+                random.randint(0, SCREEN_HEIGHT_g),
             )
         )
         self.speed = random.randint(*speed_range)

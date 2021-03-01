@@ -8,15 +8,11 @@ from config import SCREEN_HEIGHT_g, SCREEN_WIDTH_g
 
 class Engine():
     def __init__(self, use_AIPlayer=True):
-        # Define constants for the screen width and height
-        self.screen_width = SCREEN_WIDTH_g
-        self.screen_height = SCREEN_HEIGHT_g
-
         # Initialize pygame
         pygame.init()
-        self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
+        self.screen = pygame.display.set_mode((SCREEN_WIDTH_g, SCREEN_HEIGHT_g))
 
-        self.scene = ClassicScene(self.screen_width, self.screen_height, use_AIPlayer)
+        self.scene = ClassicScene(use_AIPlayer)
 
         self.running = True
         self.clock = pygame.time.Clock()
@@ -38,7 +34,7 @@ class Engine():
 
     def compute_decision_frame(self):
         frame = self.screen.get_buffer()
-        frame_buffer = np.fromstring(frame.raw, dtype='b').reshape(self.screen_height, self.screen_width, 4)
+        frame_buffer = np.fromstring(frame.raw, dtype='b').reshape(SCREEN_HEIGHT_g, SCREEN_WIDTH_g, 4)
         if self.prev_frame is not None:
             diff = frame_buffer - self.prev_frame
         else:

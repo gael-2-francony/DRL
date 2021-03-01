@@ -3,14 +3,10 @@ import pygame
 from player import *
 from enemy import Enemy
 from RL import RL_Agent
-from config import SCREEN_HEIGHT_g, SCREEN_WIDTH_g
 
 class ClassicScene():
-    def __init__(self, screen_width, screen_height, use_AIPlayer=False):
-        self.SCREEN_WIDTH = screen_width
-        self.SCREEN_HEIGHT = screen_height
+    def __init__(self, use_AIPlayer=False):
 
-        # Event to spawn enemies
         self.ADDENEMY = pygame.USEREVENT + 1
         pygame.time.set_timer(self.ADDENEMY, 250)
 
@@ -35,15 +31,13 @@ class ClassicScene():
 
     
     def update_event(self, event):
-        # Add a new enemy?
         if event.type == self.ADDENEMY:
-            # Create the new enemy and add it to sprite groups
-            new_enemy = Enemy(self.SCREEN_WIDTH, self.SCREEN_HEIGHT, self.enemy_speed)
+            new_enemy = Enemy(self.enemy_speed)
             self.enemies.add(new_enemy)
             self.all_sprites.add(new_enemy)
 
     def update(self, frame):
-        self.player.update(self.SCREEN_WIDTH, self.SCREEN_HEIGHT, frame)
+        self.player.update(frame)
 
         self.enemies.update()
 
@@ -58,7 +52,7 @@ class ClassicScene():
             self.agent.save()
 
 class FastScene(ClassicScene):
-    def __init__(self, screen_width, screen_height, use_AIPlayer=False):
-        super(FastScene, self).__init__(screen_width, screen_height, use_AIPlayer)
+    def __init__(self, use_AIPlayer=False):
+        super(FastScene, self).__init__(use_AIPlayer)
         pygame.time.set_timer(self.ADDENEMY, 100)
         self.enemy_speed = (20, 30)

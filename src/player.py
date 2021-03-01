@@ -1,7 +1,7 @@
 import pygame
 
-# Import pygame.locals for easier access to key coordinates
-# Updated to conform to flake8 and black standards
+from config import SCREEN_HEIGHT_g, SCREEN_WIDTH_g
+
 from pygame.locals import (
     K_UP,
     K_DOWN,
@@ -16,18 +16,18 @@ class Player(pygame.sprite.Sprite):
     def __init__(self, agent=None):
         super(Player, self).__init__()
         self.agent = agent
-        self.surf = pygame.Surface((75, 25))
+        self.surf = pygame.Surface((20, 5))
         self.surf.fill((255, 255, 255))
         self.rect = self.surf.get_rect()
 
-    def update(self, screen_width, screen_height, frame=None):
+    def update(self, frame=None):
         if self.agent is not None:
-            self.update_agent(frame, screen_width, screen_height)
+            self.update_agent(frame)
         else:
-            self.update_player(screen_width, screen_height)
+            self.update_player()
     
     # Move the sprite based on user keypresses
-    def update_player(self, screen_width, screen_height):
+    def update_player(self):
         pressed_keys = pygame.key.get_pressed()
         if pressed_keys[K_UP]:
             self.rect.move_ip(0, -5)
@@ -41,19 +41,19 @@ class Player(pygame.sprite.Sprite):
         # Keep player on the screen
         if self.rect.left < 0:
             self.rect.left = 0
-        if self.rect.right > screen_width:
-            self.rect.right = screen_width
+        if self.rect.right > SCREEN_WIDTH_g:
+            self.rect.right = SCREEN_WIDTH_g
         if self.rect.top <= 0:
             self.rect.top = 0
-        if self.rect.bottom >= screen_height:
-            self.rect.bottom = screen_height
+        if self.rect.bottom >= SCREEN_HEIGHT_g:
+            self.rect.bottom = SCREEN_HEIGHT_g
     
     def has_died(self, frame):
         self.kill()
         if self.agent:
             self.agent.update(frame, True)
     
-    def update_agent(self, frame, screen_width, screen_height):
+    def update_agent(self, frame):
         move = self.agent.update(frame, False)
         if move == 1: #UP
             self.rect.move_ip( 0, -5)
@@ -75,9 +75,9 @@ class Player(pygame.sprite.Sprite):
         # Keep player on the screen
         if self.rect.left < 0:
             self.rect.left = 0
-        if self.rect.right > screen_width:
-            self.rect.right = screen_width
+        if self.rect.right > SCREEN_WIDTH_g:
+            self.rect.right = SCREEN_WIDTH_g
         if self.rect.top <= 0:
             self.rect.top = 0
-        if self.rect.bottom >= screen_height:
-            self.rect.bottom = screen_height
+        if self.rect.bottom >= SCREEN_HEIGHT_g:
+            self.rect.bottom = SCREEN_HEIGHT_g

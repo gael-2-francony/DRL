@@ -7,7 +7,10 @@ Made by Thibaut Benefice, Gael De Francony and Celian Gossec
 
 ## Requirements
 ```
-pip install pygame
+python3 -m venv venv
+source venv/bin/activate
+pip install --upgrade pip
+pip install -r requirements.txt
 ```
 
 ## Usage

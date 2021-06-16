@@ -3,6 +3,7 @@ import pygame
 from player import *
 from enemy import Enemy
 from RL import RL_Agent
+from DQN import DQN
 
 class ClassicScene():
     def __init__(self, use_AIPlayer=False):
@@ -12,7 +13,7 @@ class ClassicScene():
 
         self.agent = None
         if (use_AIPlayer):
-            self.agent = RL_Agent()
+            self.agent = DQN()
         self.player = Player(self.agent)
 
         self.all_sprites = pygame.sprite.Group()
@@ -30,25 +31,26 @@ class ClassicScene():
         self.enemies = pygame.sprite.Group()
 
     def update(self, frame):
+        alive = True
         if not self.player.update(frame):
             self.player.has_died(frame)
-            return False
+            alive = False
+        else:
+            self.add_enemy_tick += 1
+            if self.add_enemy_tick >= self.add_enemy_time:
+                self.add_enemy_tick = 0
+                new_enemy = Enemy(self.enemy_speed)
+                self.enemies.add(new_enemy)
+                self.all_sprites.add(new_enemy)
 
-        self.add_enemy_tick += 1
-        if self.add_enemy_tick >= self.add_enemy_time:
-            self.add_enemy_tick = 0
-            new_enemy = Enemy(self.enemy_speed)
-            self.enemies.add(new_enemy)
-            self.all_sprites.add(new_enemy)
+            self.enemies.update()
 
-        self.enemies.update()
+            # Check collisions
+            if pygame.sprite.spritecollideany(self.player, self.enemies):
+                self.player.has_died(frame)
+                alive = False
+        return alive
 
-        # Check collisions
-        if pygame.sprite.spritecollideany(self.player, self.enemies):
-            self.player.has_died(frame)
-            return False
-        return True
-    
     def end(self):
         if self.agent:
             self.agent.save()

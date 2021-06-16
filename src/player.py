@@ -28,7 +28,7 @@ class Player(pygame.sprite.Sprite):
         else:
             self.update_player()
         return True
-    
+
     # Move the sprite based on user keypresses
     def update_player(self):
         pressed_keys = pygame.key.get_pressed()
@@ -50,14 +50,14 @@ class Player(pygame.sprite.Sprite):
             self.rect.top = 0
         if self.rect.bottom >= SCREEN_HEIGHT_g:
             self.rect.bottom = SCREEN_HEIGHT_g
-    
+
     def has_died(self, frame):
         self.kill()
         if self.agent:
-            self.agent.update(frame, True)
-    
+            self.agent.replay()
+
     def update_agent(self, frame):
-        move = self.agent.update(frame, False) + 1
+        move = self.agent.act(frame)
         if move == 1: #UP
             self.rect.move_ip( 0, -self.speed)
         if move == 2: # DOWN

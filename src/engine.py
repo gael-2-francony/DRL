@@ -18,13 +18,16 @@ class Engine():
         self.running = True
         self.clock = pygame.time.Clock()
         self.fps = 30
+        self.score = 0
 
-        self.prev_frame = None 
-    
+        self.prev_frame = None
+
     def reset(self):
         self.prev_frame = None
+        print(f"Game Over: score {self.score}")
+        self.score = 0
         self.scene.reset()
-    
+
     def draw(self):
         # Draw all sprites
         self.screen.fill((0, 0, 0))
@@ -46,13 +49,15 @@ class Engine():
         return diff
 
     def update(self):
-        self.running = self.scene.update(self.compute_decision_frame()[:,:,0])
-    
+        state = self.compute_decision_frame()[:,:,0]
+        self.running = self.scene.update(state)
+
     def end(self):
         pass
 
     def run_loop(self):
         while self.running:
+            self.score += 1
             for event in pygame.event.get():
                 if event.type == KEYDOWN:
                     if event.key == K_ESCAPE:
@@ -73,10 +78,16 @@ class TrainingEngine(Engine):
         super(TrainingEngine, self).__init__(True, render)
         self.out_file_name = file_name
         self.fps = 360
-    
+
     def update(self):
-        if not self.scene.update(self.compute_decision_frame()[:,:,0]):
+        state = self.compute_decision_frame()[:, :, 0]
+        alive = self.scene.update(state)
+        self.scene.player.agent.memorize(self.scene.player.agent.last_state,
+                                         self.scene.player.agent.last_action, 1 if alive else -1, state, True if not alive else False)
+        if self.scene.player.agent.can_replay():
+            self.scene.player.agent.replay()
+        if not alive:
             self.reset()
-    
+
     def end(self):
         self.scene.end()

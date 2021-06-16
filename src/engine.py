@@ -18,14 +18,17 @@ class Engine():
         self.running = True
         self.clock = pygame.time.Clock()
         self.fps = 30
+
         self.score = 0
+        self.episode = 0
 
         self.prev_frame = None
 
     def reset(self):
         self.prev_frame = None
-        print(f"Game Over: score {self.score}")
+        print(f"Game Over, Episode {self.episode}: score {self.score}")
         self.score = 0
+        self.episode += 1
         self.scene.reset()
 
     def draw(self):

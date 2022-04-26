@@ -16,7 +16,7 @@ class Player(pygame.sprite.Sprite):
     def __init__(self, agent=None):
         super(Player, self).__init__()
         self.agent = agent
-        self.surf = pygame.Surface((20, 5))
+        self.surf = pygame.Surface((10, 3))
         self.surf.fill((255, 255, 255))
         self.rect = self.surf.get_rect()
         self.rect.move_ip( SCREEN_WIDTH_g // 4, SCREEN_HEIGHT_g // 2)
@@ -36,10 +36,10 @@ class Player(pygame.sprite.Sprite):
             self.rect.move_ip(0, -self.speed)
         if pressed_keys[K_DOWN]:
             self.rect.move_ip(0, self.speed)
-        if pressed_keys[K_LEFT]:
-            self.rect.move_ip(-self.speed, 0)
-        if pressed_keys[K_RIGHT]:
-            self.rect.move_ip(self.speed, 0)
+        # if pressed_keys[K_LEFT]:
+        #     self.rect.move_ip(-self.speed, 0)
+        # if pressed_keys[K_RIGHT]:
+        #     self.rect.move_ip(self.speed, 0)
 
         # Keep player on the screen
         if self.rect.left < 0:
@@ -53,27 +53,28 @@ class Player(pygame.sprite.Sprite):
 
     def has_died(self, frame):
         self.kill()
-        if self.agent:
+        if self.agent and self.agent.can_replay():
             self.agent.replay()
 
-    def update_agent(self, frame):
-        move = self.agent.act(frame)
+    def update_agent(self, frame, move = None):
+        if move is None:
+            move = self.agent.act(frame) + 1
         if move == 1: #UP
             self.rect.move_ip( 0, -self.speed)
         if move == 2: # DOWN
             self.rect.move_ip( 0,  self.speed)
-        if move == 3: # LEFT
-            self.rect.move_ip(-self.speed,  0)
-        if move == 4: # RIGHT
-            self.rect.move_ip( self.speed,  0)
-        if move == 5: # UP/Left
-            self.rect.move_ip(-self.speed, -self.speed)
-        if move == 6: # UP/RIGHT
-            self.rect.move_ip( self.speed, -self.speed)
-        if move == 7: # DOWN/LEFT
-            self.rect.move_ip(-self.speed,  self.speed)
-        if move == 8: # DOWN/RIGHT
-            self.rect.move_ip( self.speed,  self.speed)
+        # if move == 3: # LEFT
+        #     self.rect.move_ip(-self.speed,  0)
+        # if move == 4: # RIGHT
+        #     self.rect.move_ip( self.speed,  0)
+        # if move == 5: # UP/Left
+        #     self.rect.move_ip(-self.speed, -self.speed)
+        # if move == 6: # UP/RIGHT
+        #     self.rect.move_ip( self.speed, -self.speed)
+        # if move == 7: # DOWN/LEFT
+        #     self.rect.move_ip(-self.speed,  self.speed)
+        # if move == 8: # DOWN/RIGHT
+        #    self.rect.move_ip( self.speed,  self.speed)
 
         # Keep player on the screen
         if self.rect.left < 0:

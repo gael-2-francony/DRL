@@ -6,3 +6,5 @@
 *-checkpoint*
 *src/__pycache__/*
 *models/*
+venv/*
+.vscode/*

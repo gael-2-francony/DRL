@@ -44,18 +44,16 @@ class Engine():
             pygame.display.flip()
 
     def compute_decision_frame(self):
-        frame = self.screen.get_buffer()
-        frame_buffer = np.fromstring(frame.raw, dtype='b').reshape(SCREEN_HEIGHT_g, SCREEN_WIDTH_g, 4)
+        frame = pygame.surfarray.array2d(self.screen)
         if self.prev_frame is not None:
-            diff = frame_buffer - self.prev_frame
+            diff = frame - self.prev_frame
         else:
-            diff = frame_buffer
-        self.prev_frame = frame_buffer
-        del frame
+            diff = frame
+        self.prev_frame = frame
         return diff
 
     def update(self):
-        state = self.compute_decision_frame()[:,:,0]
+        state = self.compute_decision_frame()
         self.running = self.scene.update(state)
 
     def end(self):

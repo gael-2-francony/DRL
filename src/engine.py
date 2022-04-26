@@ -25,10 +25,15 @@ class Engine():
         self.episode = 0
 
         self.prev_frame = None
+        self.free_run = False
 
     def reset(self):
         self.prev_frame = None
-        print(f"Game Over, Episode {self.episode}: score {self.score}")
+        self.alive = True
+        if self.free_run:
+            print(f"Free run: score {self.score}")
+        else:
+            print(f"Game Over, Episode {self.episode}: score {self.score}")
         self.scores.append(self.score)
         self.score = 0
         self.episode += 1
@@ -81,17 +86,21 @@ class TrainingEngine(Engine):
     def __init__(self, file_name=None, render=True):
         super(TrainingEngine, self).__init__(True, render)
         self.out_file_name = file_name
-        self.fps = 360
+        self.fps = 60
+        self.free_run = False
+        self.alive = True
 
     def update(self):
-        state = self.compute_decision_frame()[:, :, 0]
-        alive = self.scene.update(state)
-        self.scene.player.agent.memorize(self.scene.player.agent.last_state,
-                                         self.scene.player.agent.last_action, 1 if alive else -1, state, True if not alive else False)
-        if self.scene.player.agent.can_replay():
+        state = self.compute_decision_frame()
+        if len(self.scene.enemies) > 3:
+            self.scene.player.agent.memorize(self.scene.player.agent.last_state,
+                            self.scene.player.agent.last_action, 1 if self.alive else -100, state, True if not self.alive else False)
+        self.alive = self.scene.update(state)
+        if self.scene.player.agent.can_replay() and not self.free_run:
             self.scene.player.agent.replay()
-        if not alive:
+        if not self.alive:
             self.reset()
+            self.free_run = not self.free_run
 
     def end(self):
         fig, ax = plt.subplots(figsize=(15, 9))

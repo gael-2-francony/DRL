@@ -1,3 +1,4 @@
+import os
 import pygame
 
 from player import *
@@ -14,6 +15,8 @@ class ClassicScene():
         self.agent = None
         if (use_AIPlayer):
             self.agent = DQN()
+            if os.path.exists("dqn.h5"):
+                self.agent.model.load_weights("dqn.h5")
         self.player = Player(self.agent)
 
         self.all_sprites = pygame.sprite.Group()

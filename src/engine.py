@@ -1,3 +1,4 @@
+import matplotlib.pyplot as plt
 import pygame
 import random
 import numpy as np
@@ -20,6 +21,7 @@ class Engine():
         self.fps = 30
 
         self.score = 0
+        self.scores = []
         self.episode = 0
 
         self.prev_frame = None
@@ -27,6 +29,7 @@ class Engine():
     def reset(self):
         self.prev_frame = None
         print(f"Game Over, Episode {self.episode}: score {self.score}")
+        self.scores.append(self.score)
         self.score = 0
         self.episode += 1
         self.scene.reset()
@@ -93,4 +96,11 @@ class TrainingEngine(Engine):
             self.reset()
 
     def end(self):
+        fig, ax = plt.subplots(figsize=(15, 9))
+        ax.set_title("Score of agent through time")
+        ax.set_xlabel("Number of training episodes")
+        ax.set_ylabel("Frames survived")
+        ax.plot(np.arange(len(self.scores) / 2), self.scores[::2])
+        plt.show()
+        self.scene.player.agent.save()
         self.scene.end()
